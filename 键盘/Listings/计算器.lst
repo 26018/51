@@ -1,0 +1,197 @@
+C51 COMPILER V9.59.0.0   ______                                                            02/21/2020 18:08:56 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE ______
+OBJECT MODULE PLACED IN .\Objects\¼ÆËãÆ÷.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE ¼ÆËãÆ÷.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\¼ÆËãÆ
+                    -÷.lst) TABS(2) OBJECT(.\Objects\¼ÆËãÆ÷.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include <string.h>
+   3          
+   4          #define u8 unsigned char
+   5          #define u16 unsigned int
+   6            
+   7          sbit WE1 = P1^0;
+   8          sbit WE2 = P1^1;
+   9          sbit WE3 = P1^2;
+  10          sbit WE4 = P1^3;
+  11          sbit WE5 = P1^4;
+  12          sbit WE6 = P1^5;
+  13          
+  14          #define key P3
+  15          #define N 1
+  16          
+  17          sbit LED = P2^5;
+  18          
+  19          u8 keydata =0;
+  20          
+  21          void delay(u16 i);
+  22          u8 smg_duan[17]={0,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,0x77,0x7c,0x39,0x5e,0x79,0x71,0x3f};   //Ê
+             -ýÂë¹ÜÎª1ÔòÁÁ
+  23                     //Êý×Ö   1    2    3    4     5   6    7     8    9    A   B    C    D     E   F     0   
+  24          
+  25          u8 datasmg[20];
+  26          u8 num[20];
+  27          u8 sym,num1,num2;
+  28          
+  29          void key_scanf(void)     //¼üÅÌº¯Êý
+  30          {
+  31   1        u8 key_L, key_H;
+  32   1        keydata =0;    //³õÊ¼»¯
+  33   1        P2 = 0xf0;  // 1111 0000      //É¨ÃèÐÐ    ÕâÊÇ¼üÅÌ½Ó¿Ú
+  34   1        key_H = P2;
+  35   1        
+  36   1        if(key_H != 0xf0)
+  37   1        {
+  38   2          delay(20);
+  39   2          key_H = P2;   //¶Á×´Ì¬
+  40   2          if(key_H != 0xf0)
+  41   2          {
+  42   3            P2 = 0x0f;
+  43   3            key_L = P2;
+  44   3            if(key_H == 0xe0)  //µÚÒ»ÁÐµÄ°´¼ü°´ÏÂ   1110 0000
+  45   3            {
+  46   4              switch (key_L)  //(key_H & 0xF0) | (key_L & 0x0F)
+  47   4              {               // 0xE0 | 0x0E = 0xEE;
+  48   5                case 0x0e:keydata = 1; break; //µÚÒ»ÐÐ 
+  49   5                case 0x0d:keydata = 5; break; //µÚ¶þÐÐ
+  50   5                case 0x0b:keydata = 9; break; //µÚÈýÐÐ
+  51   5                case 0x07:keydata = 13;break; //µÚËÄÐÐ
+  52   5              }
+  53   4            }
+C51 COMPILER V9.59.0.0   ______                                                            02/21/2020 18:08:56 PAGE 2   
+
+  54   3            if(key_H == 0xd0)  //µÚ¶þÁÐµÄ°´¼ü°´ÏÂ   1101 0000
+  55   3            {
+  56   4              switch (key_L)
+  57   4              {
+  58   5                case 0x0e:keydata = 2; break; //µÚÒ»ÐÐ
+  59   5                case 0x0d:keydata = 6; break; //µÚ¶þÐÐ
+  60   5                case 0x0b:keydata = 10;break; //µÚÈýÐÐ
+  61   5                case 0x07:keydata = 14;break; //µÚËÄÐÐ
+  62   5              }
+  63   4            }
+  64   3            if(key_H == 0xb0)  //µÚÈýÁÐµÄ°´¼ü°´ÏÂ
+  65   3            {
+  66   4              switch (key_L)
+  67   4              {
+  68   5                case 0x0e:keydata = 3; break; //µÚÒ»ÐÐ
+  69   5                case 0x0d:keydata = 7; break; //µÚ¶þÐÐ
+  70   5                case 0x0b:keydata = 11;break; //µÚÈýÐÐ
+  71   5                case 0x07:keydata = 15;break; //µÚËÄÐÐ
+  72   5              }
+  73   4            }
+  74   3            if(key_H == 0x70)  //µÚËÄÁÐµÄ°´¼ü°´ÏÂ
+  75   3            {
+  76   4              switch (key_L)
+  77   4              {
+  78   5                case 0x0e:keydata = 4; break; //µÚÒ»ÐÐ     A
+  79   5                case 0x0d:keydata = 8; break; //µÚ¶þÐÐ      D
+  80   5                case 0x0b:keydata = 12;break; //µÚÈýÐÐ      C
+  81   5                case 0x07:keydata = 16;break; //µÚËÄÐÐ      F
+  82   5              }
+  83   4            }
+  84   3            while(P2 != 0x0f);
+  85   3          }
+  86   2        }
+  87   1      }
+  88          
+  89          void main()
+  90          {
+  91   1        u8 i = 0, w=0,LED = 0;
+  92   1        WE1 = 1, WE2 = 1, WE3 = 1, WE4 = 1, WE5 = 1, WE6 = 1;          //ËùÓÐµÄÎ»¹Ø±Õ
+  93   1        P0 = smg_duan[0];                  //³õÊ¼»¯ ËùÓÐµÄ ÊýÂë¹Ü ¶¼²»ÁÁ
+  94   1        memset(num,'\0',20);   //µÚÒ»´Î³õÊ¼»¯Êý¾Ý
+  95   1        
+  96   1        while(1)
+  97   1        {
+  98   2          key_scanf(); 
+  99   2      
+ 100   2          if((keydata != 0 && keydata <= 17))    //¼ÇÂ¼Êý¾Ý
+ 101   2          {
+ 102   3            datasmg[i] = smg_duan[keydata];
+ 103   3            i++;
+ 104   3            keydata = 0;
+ 105   3            if(i > 7)   //±£Ö¤Êý×Ö²»ÏÞÓÚ6Î»£¬Ã¿Ò»Î»´Ó×îºóÃæÌí¼Ó
+ 106   3              w++;
+ 107   3          }
+ 108   2          
+ 109   2          if(datasmg[w+1])
+ 110   2          {
+ 111   3              P0 = datasmg[w+1];    
+ 112   3              WE1 = 0;
+ 113   3              delay(N);
+ 114   3              WE1 = 1;
+ 115   3          }
+C51 COMPILER V9.59.0.0   ______                                                            02/21/2020 18:08:56 PAGE 3   
+
+ 116   2          
+ 117   2          if(datasmg[w+2])
+ 118   2          {
+ 119   3              P0 = datasmg[w+2];
+ 120   3              WE2 = 0;
+ 121   3              delay(N);
+ 122   3              WE2 = 1;
+ 123   3          }
+ 124   2          
+ 125   2          if(datasmg[w+3])
+ 126   2          {
+ 127   3              P0 = datasmg[w+3];
+ 128   3              WE3 = 0;
+ 129   3              delay(N);
+ 130   3              WE3 = 1;
+ 131   3          }
+ 132   2          
+ 133   2          if(datasmg[w+4])
+ 134   2          {
+ 135   3              P0 = datasmg[w+4];
+ 136   3              WE4 = 0;
+ 137   3              delay(N);
+ 138   3              WE4 = 1;
+ 139   3          }
+ 140   2          
+ 141   2          if(datasmg[w+5])
+ 142   2          {
+ 143   3              P0 = datasmg[w+5];
+ 144   3              WE5 = 0;
+ 145   3              delay(N);
+ 146   3              WE5 = 1;
+ 147   3          }
+ 148   2          
+ 149   2          if(datasmg[w+6])
+ 150   2          {
+ 151   3              P0 = datasmg[w+6];
+ 152   3              WE6 = 0;delay(N);
+ 153   3              delay(N);
+ 154   3              WE6 = 1;
+ 155   3          }
+ 156   2        } 
+ 157   1      }
+ 158          
+ 159          void delay(u16 i)
+ 160          {
+ 161   1        u8 k;
+ 162   1        while(i--)
+ 163   1        {
+ 164   2          for(k=0;k<100;k++);
+ 165   2        }
+ 166   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    427    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     61       3
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+C51 COMPILER V9.59.0.0   ______                                                            02/21/2020 18:08:56 PAGE 4   
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

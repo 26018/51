@@ -1,0 +1,51 @@
+C51 COMPILER V9.59.0.0   ____                                                              02/11/2020 14:19:16 PAGE 1   
+
+
+C51 COMPILER V9.59.0.0, COMPILATION OF MODULE ____
+OBJECT MODULE PLACED IN .\Objects\小灯.obj
+COMPILER INVOKED BY: D:\Keil\C51\BIN\C51.EXE 小灯.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\小灯.ls
+                    -t) TABS(2) OBJECT(.\Objects\小灯.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          
+   3          #define u8   unsigned char        //char        8?    0~255
+   4          #define u16  unsigned int         //int         16?  0~65535
+   5          #define u32  unsigned short int   //short int   32?
+   6          #define u64  unsigned long int    //long int    64?
+   7            
+   8          #define LED P1     //控制小灯
+   9          
+  10          void delay_ms(u16 ms)
+  11          {
+  12   1        u8 i;
+  13   1        while(ms--)
+  14   1          for(i=0;i<110;i++);
+  15   1      }
+  16          
+  17          void main()
+  18          {
+  19   1        u8 s=0;
+  20   1        while(1)
+  21   1        {
+  22   2          LED = ~(0x01 << s);   //0为亮
+  23   2          delay_ms(80);
+  24   2          s = (s+1)%9;
+  25   2        }
+  26   1          
+  27   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     67    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
